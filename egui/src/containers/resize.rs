@@ -256,7 +256,20 @@ impl Resize {
             }
         }
 
-        ui.memory().resize.insert(id, state);
+        // NOTE(shadower): If the window has a fixed size, don't store
+        // the `resize` state to memory.
+        //
+        // Without this, once a window size has been increased (e.g.
+        // by calling `fixed_size`), it could never go back to a smaller size.
+        //
+        // I assume that's desirable with normal resizable windows,
+        // but it's not for the fixed_size ones (where the fixed size
+        // is set programatically and expected to be honoured by the
+        // caller).
+
+        if self.resizable {
+            ui.memory().resize.insert(id, state);
+        }
 
         if ui.ctx().style().debug_resize {
             ui.ctx().debug_rect(
