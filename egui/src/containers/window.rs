@@ -12,6 +12,7 @@ pub struct Window<'open> {
     pub frame: Option<Frame>,
     pub resize: Resize,
     pub scroll: Option<ScrollArea>,
+    pub collapsable: bool,
 }
 
 impl<'open> Window<'open> {
@@ -36,6 +37,7 @@ impl<'open> Window<'open> {
                     .always_show_scroll(false)
                     .max_height(f32::INFINITY),
             ), // As large as we can be
+            collapsable: true,
         }
     }
 
@@ -108,6 +110,12 @@ impl<'open> Window<'open> {
         self
     }
 
+    /// Can the window be collapsed by clicking on its title?
+    pub fn collapsable(mut self, collapsable: bool) -> Self {
+        self.collapsable = collapsable;
+        self
+    }
+
     /// Not resizable, just takes the size of its contents.
     pub fn auto_sized(mut self) -> Self {
         self.resize = self.resize.auto_sized();
@@ -144,6 +152,7 @@ impl<'open> Window<'open> {
             frame,
             resize,
             scroll,
+            collapsable,
         } = self;
 
         if matches!(open, Some(false)) {
@@ -203,6 +212,7 @@ impl<'open> Window<'open> {
                 collapsing_id,
                 default_expanded,
             );
+            collapsing.enabled = collapsable;
             let show_close_button = open.is_some();
             let title_bar = show_title_bar(
                 &mut frame.content_ui,
@@ -547,7 +557,7 @@ fn show_title_bar(
         let item_spacing = ui.style().item_spacing;
         let button_size = ui.style().start_icon_width;
 
-        {
+        if collapsing.is_enabled() {
             // TODO: make clickable radius larger
             ui.allocate_space(vec2(0.0, 0.0)); // HACK: will add left spacing
 
@@ -630,6 +640,7 @@ impl TitleBar {
         if ui
             .interact(self.rect, title_bar_id, Sense::click())
             .double_clicked
+            && collapsing.is_enabled()
         {
             collapsing.toggle(ui);
         }

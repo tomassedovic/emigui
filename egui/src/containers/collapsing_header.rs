@@ -19,6 +19,10 @@ pub(crate) struct State {
 
     /// Height of the region when open. Used for animations
     open_height: Option<f32>,
+
+    /// Whether collapsing is visible and active. Set to false if you
+    /// don't want to collapse your windows.
+    pub enabled: bool,
 }
 
 impl Default for State {
@@ -27,6 +31,7 @@ impl Default for State {
             open: false,
             toggle_time: -f64::INFINITY,
             open_height: None,
+            enabled: true,
         }
     }
 }
@@ -45,6 +50,10 @@ impl State {
             .collapsing_headers
             .get(&id)
             .map(|state| state.open)
+    }
+
+    pub fn is_enabled(self) -> bool {
+        self.enabled
     }
 
     pub fn toggle(&mut self, ui: &Ui) {
