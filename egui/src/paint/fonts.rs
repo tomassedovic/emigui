@@ -27,6 +27,7 @@ pub enum TextStyle {
 pub enum FontFamily {
     Monospace,
     VariableWidth,
+    Mononoki,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -105,6 +106,10 @@ impl Fonts {
 
         // let variable_typeface_data = include_bytes!("../../fonts/DejaVuSans.ttf"); // Basic, boring, takes up more space
 
+        // TODO(shadower): add support for custom fonts and optional
+        // support for not shipping the default fonts in the library.
+        let mononoki_typeface_data = include_bytes!("../../fonts/mononoki-Regular.ttf");
+
         self.definitions = definitions.clone();
         let FontDefinitions {
             pixels_per_point,
@@ -116,6 +121,7 @@ impl Fonts {
                 let typeface_data: &[u8] = match family {
                     FontFamily::Monospace => monospace_typeface_data,
                     FontFamily::VariableWidth => variable_typeface_data,
+                    FontFamily::Mononoki => mononoki_typeface_data,
                 };
 
                 (
